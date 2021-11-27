@@ -1,0 +1,23 @@
+{
+  "name": "com.nebukam.common",
+  "version": "0.0.2",
+  "displayName": "N:Common",
+  "description": "A set of commonly used resources & object in N:Libraries. This package primary purpose is to allow some package to have dependencies over basic types, without the need to for big libs & packages.",
+  "unity": "2019.4",
+  "unityRelease": "17f1",
+  "documentationUrl":"https://nebukam.github.io/docs/unity/com.nebukam.common/",
+  "keywords": [
+    "Geometry"
+  ],
+  "category": "Geometry",
+  "author": {
+    "name": "Timothe Lapetite",
+    "email": "nebukam@gmail.com",
+    "url": "https://github.com/Nebukam/com.nebukam.common.git#0.0.1"
+  },
+  "dependencies": {
+    "com.unity.collections": "0.9.0-preview.6",
+    "com.unity.mathematics": "1.2.1",
+    "com.unity.burst": "1.4.3"
+  }
+}
