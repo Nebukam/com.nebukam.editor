@@ -9,7 +9,7 @@ using Unity.Mathematics;
 
 namespace Nebukam.Editor
 {
-    public static partial class EditorExtensions
+    public static partial class EditorDrawer
     {
 
         public static float lY = 0f;
@@ -33,8 +33,8 @@ namespace Nebukam.Editor
             lY = Y;
             Y += height;
 
-            if(inLayout)
-                r = GUILayoutUtility.GetRect(W, height, GUIStyle.none);
+            if (inLayout)
+                GUILayoutUtility.GetRect(W, height, GUIStyle.none);
 
             return r;
         }
@@ -54,6 +54,10 @@ namespace Nebukam.Editor
             X = r.x;
             lY = Y = r.y;
             W = r.width;
+
+            if (inLayout)
+                GUILayoutUtility.GetRect(W, r.height, GUIStyle.none);
+
         }
 
         public static void ToggleLayoutMode(bool toggle)
@@ -254,6 +258,20 @@ namespace Nebukam.Editor
 
         #region float
 
+        public static int Slider(ref float value, float min, float max, string label = "")
+        {
+            
+            Rect _r = R();
+
+            float result = EditorGUI.Slider(_r, value, min, max);
+
+            if (result == value) { return 0; }
+
+            value = result;
+            return 1;
+
+        }
+
         public static int MinMaxSlider(ref float2 values, float2 range, string label = "")
         {
             float
@@ -360,7 +378,7 @@ namespace Nebukam.Editor
 
         public static int InlineColorField(ref Color col, float _xOffset = 0f)
         {
-            Rect _r = new Rect(W * _xOffset + 10f, lY - (inLayout ? EditorGUIUtility.singleLineHeight : 0f), 30, EditorGUIUtility.singleLineHeight);
+            Rect _r = new Rect(_xOffset, lY, 30, EditorGUIUtility.singleLineHeight);
             Color newCol;
             newCol = EditorGUI.ColorField(_r, GUIContent.none, col, false, true, false);
 
@@ -373,12 +391,22 @@ namespace Nebukam.Editor
 
         #endregion
 
+        #region Buttons
+
+        public static bool Button(string label)
+        {
+            Rect r = R();
+            return GUI.Button(r, label);
+        }
+
+        #endregion
+
         #region Objects
 
         public static int ObjectField<T>( ref T obj, string label = "", float width = -1f, bool allowAllObjects = false )
             where T : UnityEngine.Object
         {
-            T result = EditorGUI.ObjectField(RW(-1f, width), "", obj, typeof(T), allowAllObjects) as T;
+            T result = EditorGUI.ObjectField(RW(-1f, width), label, obj, typeof(T), allowAllObjects) as T;
 
             if(result == obj) { return 0; }
 
