@@ -1,9 +1,7 @@
 {
     "name": "Nebukam.Editor",
     "references": [
-        "Unity.Mathematics",
-        "Unity.Collections",
-        "Unity.Burst"
+        "Unity.Mathematics"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
