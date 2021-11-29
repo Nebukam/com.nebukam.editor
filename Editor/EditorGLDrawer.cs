@@ -19,7 +19,7 @@ namespace Nebukam.Editor
 
         public static void SetGLShader(Shader shader)
         {
-            if(!m_mats.TryGetValue(shader, out m_currentGLMat))
+            if (!m_mats.TryGetValue(shader, out m_currentGLMat))
             {
                 m_currentGLMat = new Material(shader);
                 m_mats[shader] = m_currentGLMat;
@@ -29,9 +29,11 @@ namespace Nebukam.Editor
         public static void SetGLShader(string shader)
         {
             Shader s = Shader.Find(shader);
-            if(s == null) { s = Shader.Find("Hidden/Internal-Colored"); }
+            if (s == null) { s = Shader.Find("Hidden/Internal-Colored"); }
             SetGLShader(s);
         }
+
+        private static bool __GLACTIVE = false;
 
         public static bool BeginGL(float height = -1)
         {
@@ -40,13 +42,15 @@ namespace Nebukam.Editor
 
             if (Event.current.type != EventType.Repaint) { return false; }
 
+            GUI.BeginClip(GLArea);
+
             if (m_currentGLMat == null)
                 SetGLShader("Hidden/Internal-Colored");
 
-            GUI.BeginClip(GLArea);
             GL.Flush();
             GL.PushMatrix();
             GL.Clear(true, false, Color.black);
+
             m_currentGLMat.SetPass(0);
 
             return true;
@@ -68,7 +72,7 @@ namespace Nebukam.Editor
         {
             GL.Begin(GL.QUADS);
             GL.Color(col);
-            GLRect(new Rect(0,0, GLArea.width, GLArea.height));
+            GLRect(new Rect(0, 0, GLArea.width, GLArea.height));
             GL.End();
         }
 
@@ -79,7 +83,7 @@ namespace Nebukam.Editor
             GL.Vertex3(rect.x + rect.width, rect.y + rect.height, 0);
             GL.Vertex3(rect.x, rect.y + rect.height, 0);
 
-            if(close)
+            if (close)
                 GL.Vertex3(rect.x, rect.y, 0);
 
         }

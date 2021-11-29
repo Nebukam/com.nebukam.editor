@@ -19,12 +19,65 @@ namespace Nebukam.Editor
 
         public static bool inLayout = false;
 
-        public static Rect CR(float height = -1)
+        public static GUIStyle centeredLabel;
+
+        public static GUIStyle miniButtonLeft;
+        public static GUIStyle miniButtonMid;
+        public static GUIStyle miniButtonRight;
+        public static GUIStyle toolbarButton;
+        public static GUIStyle miniLabel;
+        public static GUIStyle miniDropdown;
+        public static GUIStyle miniPopup;
+
+        static EditorDrawer()
         {
-            if (height == -1) { height = EditorGUIUtility.singleLineHeight; }
-            return new Rect(X,Y,W, height);
+
+            int s = 10;
+
+            centeredLabel = new GUIStyle(GUI.skin.label);
+            centeredLabel.fontSize = s;
+            centeredLabel.alignment = TextAnchor.MiddleCenter;
+
+            miniButtonLeft = new GUIStyle(EditorStyles.miniButtonLeft);
+            miniButtonLeft.fontSize = s;
+            miniButtonMid = new GUIStyle(EditorStyles.miniButtonMid);
+            miniButtonMid.fontSize = s;
+            miniButtonRight = new GUIStyle(EditorStyles.miniButtonRight);
+            miniButtonRight.fontSize = s;
+
+            miniLabel = new GUIStyle(EditorStyles.miniLabel);
+            miniLabel.alignment = TextAnchor.LowerLeft;
+
+            toolbarButton = new GUIStyle(EditorStyles.toolbarButton);
+            toolbarButton.fontSize = s;
+
+            miniDropdown = new GUIStyle(EditorStyles.toolbarDropDown);
+            miniDropdown.fontSize = s;
+
+            miniPopup = new GUIStyle(EditorStyles.popup);
+            miniPopup.fontSize = s;
+
         }
 
+        /// <summary>
+        /// Return current draw area
+        /// </summary>
+        /// <param name="xOffset"></param>
+        /// <param name="yOffset"></param>
+        /// <param name="height"></param>
+        /// <param name="width"></param>
+        /// <returns></returns>
+        public static Rect CR(float xOffset = 0f, float yOffset = 0f, float height = -1, float width = -1)
+        {
+            if (height == -1) { height = EditorGUIUtility.singleLineHeight; }
+            return new Rect(X+xOffset,Y+yOffset, width < 0f ? W : width, height);
+        }
+
+        /// <summary>
+        /// Creates & update the next draw area
+        /// </summary>
+        /// <param name="height"></param>
+        /// <returns></returns>
         public static Rect R(float height = -1)
         {
             if (height == -1) { height = EditorGUIUtility.singleLineHeight; }
@@ -33,37 +86,115 @@ namespace Nebukam.Editor
             lY = Y;
             Y += height;
 
-            if (inLayout)
-                GUILayoutUtility.GetRect(W, height, GUIStyle.none);
+            //if (inLayout)
+            GUILayoutUtility.GetRect(W, height, GUIStyle.none);
 
             return r;
         }
 
-        public static Rect RW(float height = -1, float width = -1)
-        {
-            Rect r = R(height);
-            
-            if(width >= 0f)
-                r.width = width;
-
-            return r;
-        }
-
+        /// <summary>
+        /// Creates the next draw area
+        /// </summary>
+        /// <param name="r"></param>
         public static void SetR(Rect r)
         {
             X = r.x;
             lY = Y = r.y;
             W = r.width;
 
-            if (inLayout)
-                GUILayoutUtility.GetRect(W, r.height, GUIStyle.none);
+           //if (inLayout)
+           GUILayoutUtility.GetRect(W, r.height, GUIStyle.none);
 
+        }
+
+        #region layout
+
+        private static Rect onColStart;
+        private static int colCount;
+        private static int colIndex;
+        private static float colWidth;
+        private static float colSpacing;
+        private static float colYMax;
+
+        public static void BeginColumns(int count = 2, float spacing = 5f)
+        {
+            onColStart = CR();
+            colYMax = Y;
+            colIndex = 0;
+            colCount = count;
+            colSpacing = spacing;
+            colWidth = (onColStart.width - (colSpacing * (count - 1))) / count;
+            NextColumn();
+        }
+
+        public static void NextColumn()
+        {
+            colYMax = math.max(colYMax, Y);
+            SetR(new Rect(onColStart.x + ((colWidth + colSpacing) * colIndex), onColStart.y, colWidth, 0f));
+            colIndex++;
+        }
+
+        public static void EndColumns()
+        {
+            SetR(new Rect(onColStart.x, math.max(colYMax, Y), onColStart.width, 0f));
         }
 
         public static void ToggleLayoutMode(bool toggle)
         {
             inLayout = toggle;
         }
+
+        private static Rect onInLineStart;
+        private static bool inlining = false;
+        private static float inlineXOffset;
+        private static float inlineYMax;
+        public static float WLeft { get{ return onInLineStart.width - inlineXOffset; } }
+
+        public static void BeginInLine(float width)
+        {
+            onInLineStart = CR();
+            inlineYMax = Y;
+            inlineXOffset = 0f;
+            inlining = true;
+            NextInline(width);
+        }
+
+        public static void NextInline(float width)
+        {
+            inlineYMax = math.max(inlineYMax, Y);
+            SetR(new Rect(onInLineStart.x + inlineXOffset, onInLineStart.y, width, 0f));
+            inlineXOffset += width;
+        }
+
+        public static void EndInLine()
+        {
+            SetR(new Rect(onInLineStart.x, math.max(inlineYMax, Y), onInLineStart.width, 0f));
+            inlining = false;
+        }
+
+        #endregion
+
+        #region GUI
+
+        private static Color __col_col;
+        private static Color __col_bg;
+        private static Color __col_cont;
+
+        public static void HoldGUI()
+        {
+            __col_col = GUI.color;
+            __col_bg = GUI.backgroundColor;
+            __col_cont = GUI.contentColor;
+        }
+
+        public static void RestoreGUI()
+        {
+            GUI.color = __col_col;
+            GUI.backgroundColor = __col_bg;
+            GUI.contentColor = __col_cont;
+        }
+
+        #endregion
 
         #region enum
 
@@ -72,9 +203,9 @@ namespace Nebukam.Editor
         {
             T r;
             if (label != "")
-                r = (T)EditorGUI.EnumPopup(R(), label, e);
+                r = (T)EditorGUI.EnumPopup(R(), label, e, miniDropdown);
             else
-                r = (T)EditorGUI.EnumPopup(R(), e);
+                r = (T)EditorGUI.EnumPopup(R(), e, miniDropdown);
 
             if (r.Equals(e)) { return 0; }
 
@@ -83,44 +214,79 @@ namespace Nebukam.Editor
 
         }
 
-        public static int EnumGrid<T>(ref T e, string label = "")
+        public static int EnumPopupInlined<T>(ref T e, string label = "")
+            where T : Enum
         {
-            T[] eList = (T[])Enum.GetValues(typeof(T));
-            string[] list = new string[eList.Length];
-            int sel = 0, i = 0;
-            foreach (T ee in eList)
-            {
-                list[i] = ee.ToString();
-                if (ee.Equals(e)) { sel = i; }
-                i++;
-            }
+            
+            MiniLabel(label);
 
-            GUILayout.BeginHorizontal();
+            T r = (T)EditorGUI.EnumPopup(R(), e, miniPopup);
 
-            if (label != "")
-            {
-                GUILayout.Label(label);
-            }
+            if (r.Equals(e)) { return 0; }
 
-            //GUILayout.FlexibleSpace();
-
-            //int selection = GUILayout.SelectionGrid(sel, list, eList.Length);
-            i = 0;
-            int selection = -1;
-            foreach (string S in list)
-            {
-                if (GUILayout.Toggle((sel == i), S, EditorStyles.toolbarButton)) { selection = i; }
-                i++;
-            }
-
-
-            //if (label != "")
-            GUILayout.EndHorizontal();
-
-            if (selection == -1 || selection == sel) { return 0; }
-
-            e = eList[selection];
+            e = r;
             return 1;
+
+        }
+
+        public static int EnumInlined<T>(ref T e, bool displayEnumValue = false, string label = "")
+            where T : Enum
+        {
+
+            T[] enums = (T[])Enum.GetValues(typeof(T));
+            string[] labels = new string[enums.Length];
+            int currentSelection = 0, i = 0;
+            string l;
+
+            foreach (T curenum in enums)
+            {
+                if (displayEnumValue)
+                    l = ""+ Convert.ToInt32(curenum);
+                else
+                    l = curenum.ToString();
+
+                labels[i] = l;
+                if (curenum.Equals(e)) { currentSelection = i; }
+                i++;
+            }
+
+            MiniLabel(label);
+
+            i = 0;
+            int finalSelection = -1;
+            
+            Rect r = R();
+
+            Color colTrue = Color.gray;
+            Color colFalse = GUI.backgroundColor;
+            colFalse.a = 0.25f;
+
+            HoldGUI();
+
+            r.width = r.width / labels.Length;
+            GUIStyle style;
+            foreach (string elab in labels)
+            {
+                bool selected = currentSelection == i;
+                if (i == 0) { style = miniButtonLeft; }
+                else if (i == labels.Length-1) { style = miniButtonMid; }
+                else { style = miniButtonRight; }
+
+                GUI.backgroundColor = selected ? colTrue : colFalse;
+
+                if (GUI.Button(r, elab, style)) { finalSelection = i; }
+                r.x += r.width;
+                i++;
+            }
+
+            RestoreGUI();
+
+            if (finalSelection == -1 || finalSelection == currentSelection) { return 0; }
+
+            e = enums[finalSelection];
+
+            return 1;
+
         }
 
         #endregion
@@ -139,13 +305,13 @@ namespace Nebukam.Editor
 
         #region string
 
-        public static int TextInput(ref string value, string label = "", float width = -1f)
+        public static int TextInput(ref string value, string label = "")
         {
             string input;
             if (label != "")
-                input = EditorGUI.TextField(RW(-1f,width), label, value);
+                input = EditorGUI.TextField(R(), label, value);
             else
-                input = EditorGUI.TextField(RW(-1f, width), value);
+                input = EditorGUI.TextField(R(), value);
 
             if (input == value) { return 0; }
             value = input;
@@ -326,20 +492,6 @@ namespace Nebukam.Editor
 
         }
 
-        public static bool Label(string label = "")
-        {
-            if(label == "") { return false; }
-            EditorGUI.LabelField(R(), label);
-            return true;
-        }
-
-        public static bool MiniLabel(string label = "")
-        {
-            if (label == "") { return false; }
-            EditorGUI.LabelField(R(), label, EditorStyles.miniLabel);
-            return true;
-        }
-
         public static int FloatField(ref float value, string label = "")
         {
 
@@ -363,6 +515,7 @@ namespace Nebukam.Editor
 
         public static int ColorField(ref Color col, string label = "")
         {
+
             Color newCol;
             if (label != "")
                 newCol = EditorGUI.ColorField(R(),label, col);
@@ -376,11 +529,11 @@ namespace Nebukam.Editor
 
         }
 
-        public static int InlineColorField(ref Color col, float _xOffset = 0f)
+        public static int ColorFieldInlined(ref Color col)
         {
-            Rect _r = new Rect(_xOffset, lY, 30, EditorGUIUtility.singleLineHeight);
+
             Color newCol;
-            newCol = EditorGUI.ColorField(_r, GUIContent.none, col, false, true, false);
+            newCol = EditorGUI.ColorField(R(), GUIContent.none, col, false, true, false);
 
             if (newCol == col) { return 0; }
 
@@ -403,10 +556,10 @@ namespace Nebukam.Editor
 
         #region Objects
 
-        public static int ObjectField<T>( ref T obj, string label = "", float width = -1f, bool allowAllObjects = false )
+        public static int ObjectField<T>( ref T obj, string label = "", bool allowAllObjects = false )
             where T : UnityEngine.Object
         {
-            T result = EditorGUI.ObjectField(RW(-1f, width), label, obj, typeof(T), allowAllObjects) as T;
+            T result = EditorGUI.ObjectField(R(), label, obj, typeof(T), allowAllObjects) as T;
 
             if(result == obj) { return 0; }
 
@@ -418,6 +571,22 @@ namespace Nebukam.Editor
         #endregion
 
         #region Misc
+
+        public static bool Label(string label = "")
+        {
+            if (label == "") { return false; }
+            EditorGUI.LabelField(R(), label);
+            return true;
+        }
+
+        public static bool MiniLabel(string label = "")
+        {
+            if (label == "") { return false; }
+            Rect _r = R(EditorGUIUtility.singleLineHeight + 5f);
+            _r.y -= 4f;
+            EditorGUI.LabelField(_r, label, miniLabel);
+            return true;
+        }
 
         public static bool Foldout(bool open, string label)
         {
