@@ -38,7 +38,7 @@ namespace Nebukam.Editor
         public static bool BeginGL(float height = -1)
         {
 
-            GLArea = R(height);
+            GLArea = GetRect(height);
 
             if (Event.current.type != EventType.Repaint) { return false; }
 

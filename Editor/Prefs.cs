@@ -47,7 +47,6 @@ namespace Nebukam.Editor
             return defaultValue;
         }
 
-
         public static T Get<T>(string id, T defaultValue)
             where T : Object
         {
@@ -67,6 +66,20 @@ namespace Nebukam.Editor
                 return defaultValue;
             }
 
+            return defaultValue;
+        }
+
+        public static T GetFlags<T>(string id, T defaultValue)
+            where T : struct, System.Enum
+        {
+            if (EditorPrefs.HasKey(id))
+            {
+                T result;
+                if (System.Enum.TryParse<T>(EditorPrefs.GetString(id), out result))
+                    return result;
+            }
+
+            Set(id, defaultValue.ToString());
             return defaultValue;
         }
 
@@ -114,6 +127,13 @@ namespace Nebukam.Editor
             return value;
         }
 
+        public static T SetFlags<T>(string id, T value)
+            where T : struct, System.Enum
+        {
+            Set(id, value.ToString());
+            return value;
+        }
+
         #endregion
 
         #region Update
@@ -156,6 +176,15 @@ namespace Nebukam.Editor
             Object stored = Get(id, value);
             if (stored == value) { return false; }
             Set(id, value);
+            return true;
+        }
+
+        public static bool UpdateFlags<T>(string id, T value)
+            where T : struct, System.Enum
+        {
+            T stored = GetFlags(id, value);
+            if(stored.Equals(value)) { return false; }
+            SetFlags(id, value);
             return true;
         }
 
