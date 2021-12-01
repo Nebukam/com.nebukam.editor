@@ -19,7 +19,7 @@ namespace Nebukam.Editor
 
         public static void SetGLShader(Shader shader)
         {
-            if (!m_mats.TryGetValue(shader, out m_currentGLMat))
+            if (!m_mats.TryGetValue(shader, out m_currentGLMat) || m_currentGLMat == null)
             {
                 m_currentGLMat = new Material(shader);
                 m_mats[shader] = m_currentGLMat;
@@ -38,7 +38,7 @@ namespace Nebukam.Editor
         public static bool BeginGL(float height = -1)
         {
 
-            GLArea = GetRect(height);
+            GLArea = __GetRect(height);
 
             if (Event.current.type != EventType.Repaint) { return false; }
 

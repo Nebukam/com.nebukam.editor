@@ -59,6 +59,8 @@ namespace Nebukam.Editor
 
         }
 
+        #region rect
+
         /// <summary>
         /// Return current draw area
         /// </summary>
@@ -67,7 +69,7 @@ namespace Nebukam.Editor
         /// <param name="height"></param>
         /// <param name="width"></param>
         /// <returns></returns>
-        public static Rect GetCurrentRect(float xOffset = 0f, float yOffset = 0f, float height = -1, float width = -1)
+        public static Rect __GetCurrentRect(float xOffset = 0f, float yOffset = 0f, float height = -1, float width = -1)
         {
             if (height == -1) { height = EditorGUIUtility.singleLineHeight; }
             return new Rect(X+xOffset,Y+yOffset, width < 0f ? W : width, height);
@@ -78,7 +80,7 @@ namespace Nebukam.Editor
         /// </summary>
         /// <param name="height"></param>
         /// <returns></returns>
-        public static Rect GetRect(float height = -1)
+        public static Rect __GetRect(float height = -1)
         {
             if (height == -1) { height = EditorGUIUtility.singleLineHeight; }
 
@@ -96,7 +98,7 @@ namespace Nebukam.Editor
         /// Creates & set the next draw area from a given rect
         /// </summary>
         /// <param name="r"></param>
-        public static void SetRect(Rect r)
+        public static void __SetRect(Rect r)
         {
             X = r.x;
             lY = Y = r.y;
@@ -106,6 +108,8 @@ namespace Nebukam.Editor
            GUILayoutUtility.GetRect(W, r.height, GUIStyle.none);
 
         }
+
+        #endregion
 
         #region layout
 
@@ -118,7 +122,7 @@ namespace Nebukam.Editor
 
         public static void __BeginCol(int count = 2, float spacing = 5f)
         {
-            onColStart = GetCurrentRect();
+            onColStart = __GetCurrentRect();
             colYMax = Y;
             colIndex = 0;
             colCount = count;
@@ -130,13 +134,13 @@ namespace Nebukam.Editor
         public static void __NextCol()
         {
             colYMax = math.max(colYMax, Y);
-            SetRect(new Rect(onColStart.x + ((colWidth + colSpacing) * colIndex), onColStart.y, colWidth, 0f));
+            __SetRect(new Rect(onColStart.x + ((colWidth + colSpacing) * colIndex), onColStart.y, colWidth, 0f));
             colIndex++;
         }
 
         public static void __EndCol()
         {
-            SetRect(new Rect(onColStart.x, math.max(colYMax, Y), onColStart.width, 0f));
+            __SetRect(new Rect(onColStart.x, math.max(colYMax, Y), onColStart.width, 0f));
         }
 
         public static void __RequireRectUpdate(bool toggle)
@@ -152,7 +156,7 @@ namespace Nebukam.Editor
 
         public static void __BeginInLine(float width)
         {
-            onInLineStart = GetCurrentRect();
+            onInLineStart = __GetCurrentRect();
             inlineYMax = Y;
             inlineXOffset = 0f;
             inlining = true;
@@ -162,13 +166,13 @@ namespace Nebukam.Editor
         public static void __NextInline(float width)
         {
             inlineYMax = math.max(inlineYMax, Y);
-            SetRect(new Rect(onInLineStart.x + inlineXOffset, onInLineStart.y, width, 0f));
+            __SetRect(new Rect(onInLineStart.x + inlineXOffset, onInLineStart.y, width, 0f));
             inlineXOffset += width;
         }
 
         public static void __EndInLine()
         {
-            SetRect(new Rect(onInLineStart.x, math.max(inlineYMax, Y), onInLineStart.width, 0f));
+            __SetRect(new Rect(onInLineStart.x, math.max(inlineYMax, Y), onInLineStart.width, 0f));
             inlining = false;
         }
 
@@ -203,9 +207,9 @@ namespace Nebukam.Editor
         {
             T r;
             if (label != "")
-                r = (T)EditorGUI.EnumPopup(GetRect(), label, e, miniPopup);
+                r = (T)EditorGUI.EnumPopup(__GetRect(), label, e, miniPopup);
             else
-                r = (T)EditorGUI.EnumPopup(GetRect(), e, miniPopup);
+                r = (T)EditorGUI.EnumPopup(__GetRect(), e, miniPopup);
 
             if (r.Equals(e)) { return 0; }
 
@@ -220,7 +224,7 @@ namespace Nebukam.Editor
             
             MiniLabel(label);
 
-            T r = (T)EditorGUI.EnumPopup(GetRect(), e, miniPopup);
+            T r = (T)EditorGUI.EnumPopup(__GetRect(), e, miniPopup);
 
             if (r.Equals(e)) { return 0; }
 
@@ -255,7 +259,7 @@ namespace Nebukam.Editor
             i = 0;
             int finalSelection = -1;
             
-            Rect r = GetRect();
+            Rect r = __GetRect();
 
             Color colTrue = Color.gray;
             Color colFalse = GUI.backgroundColor;
@@ -293,7 +297,7 @@ namespace Nebukam.Editor
             where T : Enum
         {
             MiniLabel(label);
-            T r = (T)EditorGUI.EnumFlagsField(GetRect(), e);
+            T r = (T)EditorGUI.EnumFlagsField(__GetRect(), e);
 
             if (r.Equals(e)) { return 0; }
 
@@ -307,7 +311,7 @@ namespace Nebukam.Editor
 
         public static int Checkbox(ref bool value, string label)
         {
-            bool input = EditorGUI.Toggle(GetRect(), label, value);
+            bool input = EditorGUI.Toggle(__GetRect(), label, value);
             if (input == value) { return 0; }
             value = input;
             return 1;
@@ -321,9 +325,9 @@ namespace Nebukam.Editor
         {
             string input;
             if (label != "")
-                input = EditorGUI.TextField(GetRect(), label, value);
+                input = EditorGUI.TextField(__GetRect(), label, value);
             else
-                input = EditorGUI.TextField(GetRect(), value);
+                input = EditorGUI.TextField(__GetRect(), value);
 
             if (input == value) { return 0; }
             value = input;
@@ -370,9 +374,9 @@ namespace Nebukam.Editor
         {
             int input;
             if (label != "")
-                input = EditorGUI.IntSlider(GetRect(), label, value, min, max);
+                input = EditorGUI.IntSlider(__GetRect(), label, value, min, max);
             else
-                input = EditorGUI.IntSlider(GetRect(), value, min, max);
+                input = EditorGUI.IntSlider(__GetRect(), value, min, max);
 
             if (input == value) { return 0; }
             value = input;
@@ -387,7 +391,7 @@ namespace Nebukam.Editor
 
             MiniLabel(label);
 
-            Rect _r = GetRect();
+            Rect _r = __GetRect();
 
             rx = EditorGUI.IntField(new Rect(_r.x, _r.y, 30, _r.height), (int)rx);
             EditorGUI.MinMaxSlider(new Rect(_r.x + 30, _r.y, _r.width - 60, _r.height), ref rx, ref ry, range.x, range.y);
@@ -412,7 +416,7 @@ namespace Nebukam.Editor
 
             MiniLabel(label);
 
-            Rect _r = GetRect();
+            Rect _r = __GetRect();
 
             rx = EditorGUI.IntField(new Rect(_r.x, _r.y, 30, _r.height), (int)rx);
             EditorGUI.MinMaxSlider(new Rect(_r.x + 30, _r.y, _r.width - 60, _r.height), ref rx, ref ry, range.x, range.y);
@@ -439,7 +443,7 @@ namespace Nebukam.Editor
         public static int Slider(ref float value, float min, float max, string label = "")
         {
             
-            Rect _r = GetRect();
+            Rect _r = __GetRect();
 
             float result = EditorGUI.Slider(_r, value, min, max);
 
@@ -459,7 +463,7 @@ namespace Nebukam.Editor
 
             MiniLabel(label);
 
-            Rect _r = GetRect();
+            Rect _r = __GetRect();
 
             rx = EditorGUI.FloatField(new Rect(_r.x, _r.y, 30, _r.height), rx);
             EditorGUI.MinMaxSlider(new Rect(_r.x + 30, _r.y, _r.width - 60, _r.height), ref rx, ref ry, range.x, range.y);
@@ -484,7 +488,7 @@ namespace Nebukam.Editor
 
             MiniLabel(label);
 
-            Rect _r = GetRect();
+            Rect _r = __GetRect();
 
             rx = EditorGUI.FloatField(new Rect(_r.x, _r.y, 30, _r.height), rx);
             EditorGUI.MinMaxSlider(new Rect(_r.x + 30, _r.y, _r.width - 60, _r.height), ref rx, ref ry, range.x, range.y);
@@ -510,9 +514,9 @@ namespace Nebukam.Editor
             float input;
 
             if (label != "")
-                input = EditorGUI.FloatField(GetRect(), "Scale", value);
+                input = EditorGUI.FloatField(__GetRect(), "Scale", value);
             else
-                input = EditorGUI.FloatField(GetRect(), value);
+                input = EditorGUI.FloatField(__GetRect(), value);
 
             if (value == input) { return 0; }
 
@@ -527,8 +531,27 @@ namespace Nebukam.Editor
             float input;
 
             MiniLabel(label);
+            float b = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 20f;
+            input = EditorGUI.FloatField(__GetRect(), "·: :·", value);
+            EditorGUIUtility.labelWidth = b;
+            if (value == input) { return 0; }
 
-            input = EditorGUI.FloatField(GetRect(), value);
+            value = input;
+            return 1;
+
+        }
+
+        public static int FloatFieldClamped(ref float value, float min, float max, string label = "")
+        {
+
+            float input;
+
+            MiniLabel(label);
+            float b = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 20f;
+            input = math.clamp(EditorGUI.FloatField(__GetRect(), "·: :·", value), min, max);
+            EditorGUIUtility.labelWidth = b;
             if (value == input) { return 0; }
 
             value = input;
@@ -545,9 +568,9 @@ namespace Nebukam.Editor
 
             Color newCol;
             if (label != "")
-                newCol = EditorGUI.ColorField(GetRect(),label, col);
+                newCol = EditorGUI.ColorField(__GetRect(),label, col);
             else
-                newCol = EditorGUI.ColorField(GetRect(), col);
+                newCol = EditorGUI.ColorField(__GetRect(), col);
 
             if (newCol == col) { return 0; }
 
@@ -560,7 +583,7 @@ namespace Nebukam.Editor
         {
 
             Color newCol;
-            newCol = EditorGUI.ColorField(GetRect(), GUIContent.none, col, false, true, false);
+            newCol = EditorGUI.ColorField(__GetRect(), GUIContent.none, col, false, true, false);
 
             if (newCol == col) { return 0; }
 
@@ -575,7 +598,7 @@ namespace Nebukam.Editor
 
         public static bool Button(string label)
         {
-            Rect r = GetRect();
+            Rect r = __GetRect();
             return GUI.Button(r, label);
         }
 
@@ -586,7 +609,7 @@ namespace Nebukam.Editor
         public static int ObjectField<T>( ref T obj, string label = "", bool allowAllObjects = false )
             where T : UnityEngine.Object
         {
-            T result = EditorGUI.ObjectField(GetRect(), label, obj, typeof(T), allowAllObjects) as T;
+            T result = EditorGUI.ObjectField(__GetRect(), label, obj, typeof(T), allowAllObjects) as T;
 
             if(result == obj) { return 0; }
 
@@ -602,14 +625,14 @@ namespace Nebukam.Editor
         public static bool Label(string label = "")
         {
             if (label == "") { return false; }
-            EditorGUI.LabelField(GetRect(), label);
+            EditorGUI.LabelField(__GetRect(), label);
             return true;
         }
 
         public static bool MiniLabel(string label = "")
         {
             if (label == "") { return false; }
-            Rect _r = GetRect(EditorGUIUtility.singleLineHeight + 5f);
+            Rect _r = __GetRect(EditorGUIUtility.singleLineHeight + 5f);
             _r.y -= 4f;
             EditorGUI.LabelField(_r, label, miniLabel);
             return true;
@@ -617,33 +640,41 @@ namespace Nebukam.Editor
 
         public static bool Foldout(bool open, string label)
         {
-            return EditorGUI.Foldout(GetRect(), open, label, true);
+            return EditorGUI.Foldout(__GetRect(), open, label, true);
         }
 
         public static void Line(float w = 1f, int i_height = 1)
         {
 
-            GetRect(2f);
-            Rect rect = GetRect(i_height);
+            __GetRect(2f);
+            Rect rect = __GetRect(i_height);
 
             rect.x += (rect.width * (1f - w)) * 0.5f;
             rect.width = rect.width * w;
 
             EditorGUI.DrawRect(rect, new Color(0f, 0f, 0f, 0.5f));
-            GetRect(2f);
+            __GetRect(2f);
         }
 
         public static void Space(float size)
         {
-            GetRect(size);
+            __GetRect(size);
         }
 
         public static void Separator(float size)
         {
-            Rect r = GetRect(size);
+            Rect r = __GetRect(size);
             r.y += size * 0.5f - 1f;
             r.height = 1f;
             EditorGUI.DrawRect(r, new Color(0f, 0f, 0f, 0.5f));
+        }
+
+        public static void Separator(float size, Color col)
+        {
+            Rect r = __GetRect(size);
+            r.y += size * 0.5f - 1f;
+            r.height = 1f;
+            EditorGUI.DrawRect(r, col);
         }
 
         #endregion
