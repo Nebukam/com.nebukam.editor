@@ -436,6 +436,40 @@ namespace Nebukam.Editor
 
         }
 
+        public static int IntField(ref int value, string label = "")
+        {
+
+            int input;
+
+            MiniLabel(label);
+            float b = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 20f;
+            input = EditorGUI.IntField(__GetRect(), "·: :·", value);
+            EditorGUIUtility.labelWidth = b;
+            if (value == input) { return 0; }
+
+            value = input;
+            return 1;
+
+        }
+
+        public static int IntFieldInline(ref int value, string label = "")
+        {
+
+            int input;
+
+            if (label != "")
+                input = EditorGUI.IntField(__GetRect(), label, value);
+            else
+                input = EditorGUI.IntField(__GetRect(), value);
+
+            if (value == input) { return 0; }
+
+            value = input;
+            return 1;
+
+        }
+
         #endregion
 
         #region float
@@ -514,7 +548,7 @@ namespace Nebukam.Editor
             float input;
 
             if (label != "")
-                input = EditorGUI.FloatField(__GetRect(), "Scale", value);
+                input = EditorGUI.FloatField(__GetRect(), label, value);
             else
                 input = EditorGUI.FloatField(__GetRect(), value);
 
