@@ -672,6 +672,18 @@ namespace Nebukam.Editor
             return true;
         }
 
+        public static void HelpBox(string message, MessageType type, float height = -1f, float spacing = -1f)
+        {
+            if(spacing > 0f)
+                Space(spacing);
+
+            Rect rect = __GetRect(height);
+            EditorGUI.HelpBox(rect, message, type);
+
+            if (spacing > 0f)
+                Space(spacing);
+        }
+
         public static bool Foldout(bool open, string label)
         {
             return EditorGUI.Foldout(__GetRect(), open, label, true);
