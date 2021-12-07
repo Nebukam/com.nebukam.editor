@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using Unity.Mathematics;
+
 
 namespace Nebukam.Editor
 {
@@ -59,7 +61,7 @@ namespace Nebukam.Editor
 
         }
 
-        #region rect
+#region rect
 
         /// <summary>
         /// Return current draw area
@@ -109,9 +111,9 @@ namespace Nebukam.Editor
 
         }
 
-        #endregion
+#endregion
 
-        #region layout
+#region layout
 
         private static Rect onColStart;
         private static int colCount;
@@ -176,9 +178,9 @@ namespace Nebukam.Editor
             inlining = false;
         }
 
-        #endregion
+#endregion
 
-        #region GUI
+#region GUI
 
         private static Color __col_col;
         private static Color __col_bg;
@@ -198,9 +200,9 @@ namespace Nebukam.Editor
             GUI.contentColor = __col_cont;
         }
 
-        #endregion
+#endregion
 
-        #region enum
+#region enum
 
         public static int EnumPopup<T>(ref T e, string label = "")
             where T : Enum
@@ -305,9 +307,9 @@ namespace Nebukam.Editor
             return 1;
         }
 
-        #endregion
+#endregion
 
-        #region bool
+#region bool
 
         public static int Checkbox(ref bool value, string label)
         {
@@ -317,9 +319,9 @@ namespace Nebukam.Editor
             return 1;
         }
 
-        #endregion
+#endregion
 
-        #region string
+#region string
 
         public static int TextInput(ref string value, string label = "")
         {
@@ -366,9 +368,9 @@ namespace Nebukam.Editor
 
         }
 
-        #endregion
+#endregion
 
-        #region int
+#region int
 
         public static int Slider(ref int value, int min, int max, string label = "")
         {
@@ -470,9 +472,9 @@ namespace Nebukam.Editor
 
         }
 
-        #endregion
+#endregion
 
-        #region float
+#region float
 
         public static int Slider(ref float value, float min, float max, string label = "")
         {
@@ -593,9 +595,9 @@ namespace Nebukam.Editor
 
         }
 
-        #endregion
+#endregion
 
-        #region Colors
+#region Colors
 
         public static int ColorField(ref Color col, string label = "")
         {
@@ -626,9 +628,9 @@ namespace Nebukam.Editor
 
         }
 
-        #endregion
+#endregion
 
-        #region Buttons
+#region Buttons
 
         public static bool Button(string label)
         {
@@ -636,9 +638,9 @@ namespace Nebukam.Editor
             return GUI.Button(r, label);
         }
 
-        #endregion
+#endregion
 
-        #region Objects
+#region Objects
 
         public static int ObjectField<T>( ref T obj, string label = "", bool allowAllObjects = false )
             where T : UnityEngine.Object
@@ -652,9 +654,9 @@ namespace Nebukam.Editor
 
         }
 
-        #endregion
+#endregion
 
-        #region Misc
+#region Misc
 
         public static bool Label(string label = "")
         {
@@ -672,7 +674,7 @@ namespace Nebukam.Editor
             return true;
         }
 
-        public static void HelpBox(string message, MessageType type, float height = -1f, float spacing = -1f)
+        public static void HelpBox(string message, UnityEditor.MessageType type, float height = -1f, float spacing = -1f)
         {
             if(spacing > 0f)
                 Space(spacing);
@@ -723,7 +725,8 @@ namespace Nebukam.Editor
             EditorGUI.DrawRect(r, col);
         }
 
-        #endregion
+#endregion
 
     }
 }
+#endif
