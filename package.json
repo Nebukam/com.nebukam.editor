@@ -16,6 +16,6 @@
     "url": "https://github.com/Nebukam/com.nebukam.editor.git"
   },
   "dependencies": {
-    "com.unity.mathematics": "1.2.1"
+    "com.unity.mathematics": "1.3.1"
   }
 }
